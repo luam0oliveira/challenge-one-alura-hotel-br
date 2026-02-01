@@ -11,10 +11,16 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
+
+import controller.ReservaController;
+
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.text.Format;
+import java.time.Instant;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -38,6 +44,7 @@ public class ReservasView extends JFrame {
 	private JLabel labelExit;
 	private JLabel lblValorSimbolo; 
 	private JLabel labelAtras;
+	private ReservaController reservaController;
 
 	/**
 	 * Launch the application.
@@ -60,6 +67,7 @@ public class ReservasView extends JFrame {
 	 */
 	public ReservasView() {
 		super("Reserva");
+		reservaController = new ReservaController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(ReservasView.class.getResource("/imagenes/aH-40px.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 560);
@@ -141,7 +149,25 @@ public class ReservasView extends JFrame {
 		txtDataS.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtDataS.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
-				//Ativa o evento, após o usuário selecionar as datas, o valor da reserva deve ser calculado
+				Date dataEntrada = txtDataE.getDate();
+				Date dataSaida = txtDataS.getDate();
+				
+				try {
+					if (dataEntrada == null || dataSaida == null) {
+						throw new NullPointerException("Preencha as datas");
+					}
+					
+					if (!reservaController.validaData(dataEntrada, dataSaida)) {
+						throw new IllegalArgumentException("A data de entrada deve ser antes da data de saida.");
+					}
+					Long dias = TimeUnit.DAYS.convert(dataSaida.getTime() - dataEntrada.getTime(), TimeUnit.MILLISECONDS);
+					txtValor.setText(reservaController.handlePreco(dias).toString());
+				} catch(IllegalArgumentException er) {
+					txtDataE.setDate(null);
+					txtDataS.setDate(null);
+					JOptionPane.showMessageDialog(null, er.getMessage());
+				} catch(Exception er) {
+				}
 			}
 		});
 		txtDataS.setDateFormatString("yyyy-MM-dd");
@@ -151,16 +177,17 @@ public class ReservasView extends JFrame {
 		
 	
 		
-		txtValor = new JTextField();
+		txtValor = new JTextField(50);
+		txtValor.setText((new Double(0)).toString());
 		txtValor.setBackground(SystemColor.text);
-		txtValor.setHorizontalAlignment(SwingConstants.CENTER);
+		txtValor.setHorizontalAlignment(SwingConstants.LEFT);
 		txtValor.setForeground(Color.BLACK);
-		txtValor.setBounds(78, 328, 43, 33);
+		txtValor.setBounds(78, 328, 200, 33);
 		txtValor.setEditable(false);
 		txtValor.setFont(new Font("Roboto Black", Font.BOLD, 17));
 		txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		txtValor.setColumns(500);
 		panel.add(txtValor);
-		txtValor.setColumns(10);
 		
 		JLabel lblValor = new JLabel("VALOR DA RESERVA");
 		lblValor.setForeground(SystemColor.textInactiveText);
@@ -295,11 +322,15 @@ public class ReservasView extends JFrame {
 		btnProximo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (ReservasView.txtDataE.getDate() != null && ReservasView.txtDataS.getDate() != null) {		
+				try {
+					if (ReservasView.txtDataE.getDate() == null || ReservasView.txtDataS.getDate() == null) {
+						throw new NullPointerException("Deve preencher todos os campos.");
+					}
+					
 					RegistroHospede registro = new RegistroHospede();
 					registro.setVisible(true);
-				} else {
-					JOptionPane.showMessageDialog(null, "Deve preencher todos os campos.");
+				} catch (Exception er) {
+					JOptionPane.showMessageDialog(null, er.getMessage());					
 				}
 			}						
 		});
@@ -315,6 +346,8 @@ public class ReservasView extends JFrame {
 		lblSeguinte.setFont(new Font("Roboto", Font.PLAIN, 18));
 		lblSeguinte.setBounds(0, 0, 122, 35);
 		btnProximo.add(lblSeguinte);
+		
+		
 	}
 
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" e "y"	

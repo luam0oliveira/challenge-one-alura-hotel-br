@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.LoginController;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,6 +32,7 @@ public class Login extends JFrame {
 	private JPasswordField txtSenha;
 	int xMouse, yMouse;
 	private JLabel labelExit;
+	private LoginController loginController;
 
 	/**
 	 * Launch the application.
@@ -192,6 +196,7 @@ public class Login extends JFrame {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				System.out.println("TESTE");
 				Login();
 			}
 		});
@@ -232,21 +237,21 @@ public class Login extends JFrame {
 		header.setBounds(0, 0, 784, 36);
 		panel.add(header);
 		header.setLayout(null);
+		
+		loginController = new LoginController();
 	}
 	
 	private void Login() {
-		 String Usuario= "admin";
-	     String Senha="admin";
+		String nome=txtUsuario.getText();
+        String senhaa=new String (txtSenha.getPassword());
 
-	        String senhaa=new String (txtSenha.getPassword());
-
-	        if(txtUsuario.getText().equals(Usuario) && senhaa.equals(Senha)){
-	            MenuUsuario menu = new MenuUsuario();
-	            menu.setVisible(true);
-	            dispose();	 
-	        }else {
-	            JOptionPane.showMessageDialog(this, "Usuario ou Senha não válidos");
-	        }
+        if(loginController.handleLogin(nome, senhaa)){
+            MenuUsuario menu = new MenuUsuario();
+            menu.setVisible(true);
+            dispose();	 
+        }else {
+            JOptionPane.showMessageDialog(this, "Usuario ou Senha não válidos");
+        }
 	} 
 	
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" e "y"
