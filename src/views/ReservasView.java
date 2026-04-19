@@ -61,7 +61,8 @@ public class ReservasView extends JFrame {
 			}
 		});
 	}
-
+	
+	
 	/**
 	 * Create the frame.
 	 */
@@ -326,8 +327,11 @@ public class ReservasView extends JFrame {
 					if (ReservasView.txtDataE.getDate() == null || ReservasView.txtDataS.getDate() == null) {
 						throw new NullPointerException("Deve preencher todos os campos.");
 					}
+					// gera numero de reserva
+					Long numeroReserva = reservaController.getReserva();
 					
-					RegistroHospede registro = new RegistroHospede();
+					
+					RegistroHospede registro = new RegistroHospede(numeroReserva);
 					registro.setVisible(true);
 				} catch (Exception er) {
 					JOptionPane.showMessageDialog(null, er.getMessage());					

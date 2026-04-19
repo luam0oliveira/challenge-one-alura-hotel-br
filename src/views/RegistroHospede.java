@@ -7,6 +7,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
+
+import controller.HospedeController;
+import controller.ReservaController;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -20,6 +24,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.text.Format;
+import java.time.Instant;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -37,6 +43,7 @@ public class RegistroHospede extends JFrame {
 	private JComboBox<Format> txtNacionalidade;
 	private JLabel labelExit;
 	private JLabel labelAtras;
+	private HospedeController hospedeController;
 	int xMouse, yMouse;
 
 	/**
@@ -46,7 +53,7 @@ public class RegistroHospede extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					RegistroHospede frame = new RegistroHospede();
+					RegistroHospede frame = new RegistroHospede(0L);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -58,8 +65,9 @@ public class RegistroHospede extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public RegistroHospede() {
-		
+	public RegistroHospede(Long numeroReserva) {
+		// TODO: trocar para injecao
+		this.hospedeController = new HospedeController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(RegistroHospede.class.getResource("/imagenes/lOGO-50PX.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 634);
@@ -241,6 +249,8 @@ public class RegistroHospede extends JFrame {
 		txtNreserva.setColumns(10);
 		txtNreserva.setBackground(Color.WHITE);
 		txtNreserva.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		txtNreserva.setText(numeroReserva.toString());
+		txtNreserva.setEditable(false);
 		contentPane.add(txtNreserva);
 		
 		JSeparator separator_1_2 = new JSeparator();
@@ -284,6 +294,30 @@ public class RegistroHospede extends JFrame {
 		btnsalvar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// Salva no banco e se tudo der certo, passa para sucesso.
+				try {
+					if (txtNome.getText().isBlank()) {
+						throw new Error("Preencha o nome.");
+					}
+					if (txtSobrenome.getText().isBlank()) {
+						throw new Error("Preencha o sobrenome.");
+					}
+					if (txtDataN.getDate().after(Date.from(Instant.now()))) {
+						throw new Error("Data invalida.");
+					}
+					if (txtTelefone.getText().isBlank()) {
+						throw new Error("Preencha o telefone.");
+					}
+					
+					// Salva
+					Boolean success = hospedeController.salvaHospede(txtNome.getText(), txtSobrenome.getText(), txtDataN.getDate(), (String) txtNacionalidade.getSelectedItem(), txtTelefone.getText(), numeroReserva);
+				
+					dispose();
+					Sucesso sucesso = new Sucesso();
+					sucesso.setVisible(true);
+				} catch (Error er) {
+					JOptionPane.showMessageDialog(null, er.getMessage());
+				}
 			}
 		});
 		btnsalvar.setLayout(null);
