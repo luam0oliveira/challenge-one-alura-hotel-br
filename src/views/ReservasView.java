@@ -327,12 +327,19 @@ public class ReservasView extends JFrame {
 					if (ReservasView.txtDataE.getDate() == null || ReservasView.txtDataS.getDate() == null) {
 						throw new NullPointerException("Deve preencher todos os campos.");
 					}
+					
+					Long dias = getDays(txtDataE.getDate(), txtDataS.getDate());
 					// gera numero de reserva
-					Long numeroReserva = reservaController.getReserva();
 					
+					Long numeroReserva = reservaController.createReserva(
+							txtDataE.getDate(), ReservasView.txtDataS.getDate(),
+							reservaController.handlePreco(dias),
+							txtFormaPagamento.getSelectedObjects()[0].toString());
 					
+					if (numeroReserva == -1) throw new Exception("Erro");
 					RegistroHospede registro = new RegistroHospede(numeroReserva);
 					registro.setVisible(true);
+					dispose();
 				} catch (Exception er) {
 					JOptionPane.showMessageDialog(null, er.getMessage());					
 				}
@@ -350,19 +357,21 @@ public class ReservasView extends JFrame {
 		lblSeguinte.setFont(new Font("Roboto", Font.PLAIN, 18));
 		lblSeguinte.setBounds(0, 0, 122, 35);
 		btnProximo.add(lblSeguinte);
-		
-		
 	}
 
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" e "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
-	        xMouse = evt.getX();
-	        yMouse = evt.getY();
-	    }
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+    }
 
-	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
-	        int x = evt.getXOnScreen();
-	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse, y - yMouse);
+    }
+    
+    private Long getDays(Date dataE, Date dataS) {
+    	return TimeUnit.DAYS.convert(dataS.getTime() - dataE.getTime(), TimeUnit.MILLISECONDS);
+    }
 }

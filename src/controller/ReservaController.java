@@ -2,10 +2,18 @@ package controller;
 
 import java.util.Date;
 
+import database.Reserva;
+
 public class ReservaController {
 	private final Double precoPorDia = 150.00;
 	
 	private static Long reserva = 0L;
+	
+	private Reserva reservaDao;
+	
+	public ReservaController() {
+		this.reservaDao = new Reserva();
+	}
 	
 	public Boolean validaData(Date entrada, Date saida) {
 		return (entrada != null) && (saida != null) && entrada.compareTo(saida) <= 0;
@@ -22,5 +30,9 @@ public class ReservaController {
 	
 	public static void increaseReserva() {
 		reserva+=1;
+	}
+	
+	public Long createReserva(Date in, Date out, Double valor, String forma) {
+		return reservaDao.create(in, out, valor, forma);
 	}
 }

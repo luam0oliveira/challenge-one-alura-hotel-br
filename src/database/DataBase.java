@@ -2,6 +2,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -86,13 +87,8 @@ public class DataBase {
 		}
 	}
 	
-	public ResultSet executeQuery(String query) throws SQLException {
-		try(Connection conn = DriverManager.getConnection(url,user, password)) {
-			Statement stt = conn.createStatement();
-			ResultSet sttResult = stt.executeQuery(query);
-			return sttResult;
-		} catch(Exception ex) {
-			throw new SQLException(ex.getMessage());
-		}
+	
+	public Connection getConnection() throws SQLException {
+		return DriverManager.getConnection(url, user, password);
 	}
 }
