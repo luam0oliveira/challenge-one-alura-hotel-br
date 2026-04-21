@@ -311,7 +311,7 @@ public class RegistroHospede extends JFrame {
 					
 					// Salva
 					Boolean success = hospedeController.salvaHospede(txtNome.getText(), txtSobrenome.getText(), txtDataN.getDate(), (String) txtNacionalidade.getSelectedItem(), txtTelefone.getText(), numeroReserva);
-				
+
 					dispose();
 					Sucesso sucesso = new Sucesso();
 					sucesso.setVisible(true);
