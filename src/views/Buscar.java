@@ -278,12 +278,11 @@ public class Buscar extends JFrame {
 		btnDeletar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JTable selected = (JTable) scroll_table.getViewport().getView();
-				
+				JTable selected = (JTable) ((JScrollPane)panel.getSelectedComponent()).getViewport().getView();
 				if (selected.getSelectedRow()!=-1) {
 					Long id = (Long) selected.getValueAt(selected.getSelectedRow(), 0);
 					if (selected == tbHospedes) {
-						buscarController.deleteHospede(id);
+						System.out.println(id);
 					} else {
 						buscarController.deleteReserva(id);
 					}
