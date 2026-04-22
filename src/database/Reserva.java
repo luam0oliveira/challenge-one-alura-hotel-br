@@ -77,4 +77,23 @@ public class Reserva {
 			System.out.println(e.getMessage());
 		}
 	}
+	
+	public void update(Long id, Date in, Date out, Double valor, String forma) {
+		try (Connection con = this.dataBase.getConnection()){
+			String update = "UPDATE reserva SET"
+					+ " DataIn = ?, DataOut = ?, valor = ?, forma = ?"
+					+ " WHERE id = ?";
+			PreparedStatement pstt = con.prepareStatement(update, Statement.RETURN_GENERATED_KEYS);
+			
+			pstt.setDate(1, SqlUtils.from(in));
+			pstt.setDate(2, SqlUtils.from(out));
+			pstt.setDouble(3, valor);
+			pstt.setString(4, forma);
+			pstt.setLong(5, id);
+			pstt.execute();
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
 }

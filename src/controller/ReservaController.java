@@ -5,7 +5,7 @@ import java.util.Date;
 import database.Reserva;
 
 public class ReservaController {
-	private final Double precoPorDia = 150.00;
+	private static final Double precoPorDia = 150.00;
 	
 	private static Long reserva = 0L;
 	
@@ -30,6 +30,10 @@ public class ReservaController {
 	
 	public static void increaseReserva() {
 		reserva+=1;
+	}
+	
+	public static Double getPrecoPorDia() {
+		return precoPorDia;
 	}
 	
 	public Long createReserva(Date in, Date out, Double valor, String forma) {

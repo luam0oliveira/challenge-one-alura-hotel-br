@@ -22,8 +22,8 @@ public class ReservaDTO {
 		ret.add(from.id);
 		ret.add(from.dateIn);
 		ret.add(from.dateOut);
-		ret.add(from.forma);
 		ret.add(from.valor);
+		ret.add(from.forma);
 		return ret;
 	}
 }

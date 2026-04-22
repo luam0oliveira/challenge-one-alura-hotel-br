@@ -28,6 +28,9 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 
 @SuppressWarnings("serial")
@@ -261,6 +264,36 @@ public class Buscar extends JFrame {
 		btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnEditar);
 		
+		btnEditar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable selected = (JTable) ((JScrollPane)panel.getSelectedComponent()).getViewport().getView();
+				if (selected.getSelectedRow()!=-1) {
+					int row = selected.getSelectedRow();
+					Long id = (Long) selected.getValueAt(row, 0);
+					if (selected == tbHospedes) {
+						// TODO: view EditarHospede
+					} else {
+//						Date in = new Date("")
+						SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+						Date in, out;
+						try {
+							System.out.println("KAKKA");
+							in = sdt.parse(selected.getValueAt(row, 1).toString());
+							out = sdt.parse(selected.getValueAt(row, 2).toString());							
+							String forma = (String)selected.getValueAt(row, 4);
+							
+							EditarReservas editarReservas = new EditarReservas(id, in, out, forma);
+							editarReservas.setVisible(true);
+							dispose();
+						} catch (Exception e2) {
+							System.out.println(e2.getMessage());
+						}
+					}
+				}
+			}
+		});
+		
 		JLabel lblEditar = new JLabel("EDITAR");
 		lblEditar.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEditar.setForeground(Color.WHITE);
@@ -275,6 +308,7 @@ public class Buscar extends JFrame {
 		btnDeletar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnDeletar);
 		
+		// Delete
 		btnDeletar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -282,7 +316,7 @@ public class Buscar extends JFrame {
 				if (selected.getSelectedRow()!=-1) {
 					Long id = (Long) selected.getValueAt(selected.getSelectedRow(), 0);
 					if (selected == tbHospedes) {
-						System.out.println(id);
+						buscarController.deleteHospede(id);
 					} else {
 						buscarController.deleteReserva(id);
 					}
