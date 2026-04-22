@@ -57,4 +57,18 @@ public class Hospede {
 			System.out.println(e.getMessage());
 		}
 	}
+	
+	public void delete(Long id) {
+		try (Connection con = this.dataBase.getConnection()){
+			String update = "DELETE FROM hospede WHERE id = ?";
+			PreparedStatement pstt = con.prepareStatement(update);
+			
+			pstt.setLong(1, id);
+
+			pstt.execute();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
 }

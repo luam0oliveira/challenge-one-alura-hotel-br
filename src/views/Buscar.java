@@ -6,10 +6,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import controller.BuscarController;
+
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTabbedPane;
@@ -17,9 +22,13 @@ import java.awt.Toolkit;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
+
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.Vector;
 
 @SuppressWarnings("serial")
 public class Buscar extends JFrame {
@@ -32,7 +41,9 @@ public class Buscar extends JFrame {
 	private DefaultTableModel modeloHospedes;
 	private JLabel labelAtras;
 	private JLabel labelExit;
+	private BuscarController buscarController;
 	int xMouse, yMouse;
+	Long selectedId;
 
 	/**
 	 * Launch the application.
@@ -54,6 +65,7 @@ public class Buscar extends JFrame {
 	 * Create the frame.
 	 */
 	public Buscar() {
+		buscarController = new BuscarController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Buscar.class.getResource("/imagenes/lOGO-50PX.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 571);
@@ -83,8 +95,12 @@ public class Buscar extends JFrame {
 		panel.setFont(new Font("Roboto", Font.PLAIN, 16));
 		panel.setBounds(20, 169, 865, 328);
 		contentPane.add(panel);
-				
-		tbReservas = new JTable();
+		
+		
+		// TODO: Classe separada de JTable que tenha rewrite de metodo
+		tbReservas = new JTable() {
+			public boolean isCellEditable(int row, int column) { return false;}
+		};
 		tbReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbReservas.setFont(new Font("Roboto", Font.PLAIN, 16));
 		modelo = (DefaultTableModel) tbReservas.getModel();
@@ -94,9 +110,15 @@ public class Buscar extends JFrame {
 		modelo.addColumn("Valor");
 		modelo.addColumn("Forma de Pago");
 		JScrollPane scroll_table = new JScrollPane(tbReservas);
+		
 		panel.addTab("Reservas", new ImageIcon(Buscar.class.getResource("/imagenes/reservado.png")), scroll_table, null);
 		scroll_table.setVisible(true);
 		
+		
+		Vector<Vector<Object>> reservasData = buscarController.getAllReservas();
+		for(Vector<Object> vec: reservasData) {
+			modelo.addRow(vec);
+		}		
 		
 		tbHospedes = new JTable();
 		tbHospedes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -112,6 +134,20 @@ public class Buscar extends JFrame {
 		JScrollPane scroll_tableHuespedes = new JScrollPane(tbHospedes);
 		panel.addTab("Huéspedes", new ImageIcon(Buscar.class.getResource("/imagenes/pessoas.png")), scroll_tableHuespedes, null);
 		scroll_tableHuespedes.setVisible(true);
+		Vector<Vector<Object>> hospedesData = buscarController.getAllHospedes();
+		for(Vector<Object> vec: hospedesData) {
+			modeloHospedes.addRow(vec);
+		}
+		
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				tbHospedes.clearSelection();
+				tbReservas.clearSelection();
+			}
+		});
 		
 		JLabel lblNewLabel_2 = new JLabel("");
 		lblNewLabel_2.setIcon(new ImageIcon(Buscar.class.getResource("/imagenes/Ha-100px.png")));
@@ -122,8 +158,7 @@ public class Buscar extends JFrame {
 		header.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				headerMouseDragged(e);
-			     
+				headerMouseDragged(e);    
 			}
 		});
 		header.addMouseListener(new MouseAdapter() {
@@ -205,12 +240,7 @@ public class Buscar extends JFrame {
 		contentPane.add(separator_1_2);
 		
 		JPanel btnbuscar = new JPanel();
-		btnbuscar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-
-			}
-		});
+		
 		btnbuscar.setLayout(null);
 		btnbuscar.setBackground(new Color(12, 138, 199));
 		btnbuscar.setBounds(748, 125, 122, 35);
@@ -245,6 +275,25 @@ public class Buscar extends JFrame {
 		btnDeletar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnDeletar);
 		
+		btnDeletar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable selected = (JTable) scroll_table.getViewport().getView();
+				
+				if (selected.getSelectedRow()!=-1) {
+					Long id = (Long) selected.getValueAt(selected.getSelectedRow(), 0);
+					if (selected == tbHospedes) {
+						buscarController.deleteHospede(id);
+					} else {
+						buscarController.deleteReserva(id);
+					}
+					
+					DefaultTableModel model = (DefaultTableModel) selected.getModel();
+					model.removeRow(selected.getSelectedRow());
+				}
+			}
+		});
+		
 		JLabel lblExcluir = new JLabel("DELETAR");
 		lblExcluir.setHorizontalAlignment(SwingConstants.CENTER);
 		lblExcluir.setForeground(Color.WHITE);
@@ -256,13 +305,15 @@ public class Buscar extends JFrame {
 	
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" e "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
-	        xMouse = evt.getX();
-	        yMouse = evt.getY();
-	    }
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+    }
 
-	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
-	        int x = evt.getXOnScreen();
-	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse, y - yMouse);
+    }
+    
+    
 }

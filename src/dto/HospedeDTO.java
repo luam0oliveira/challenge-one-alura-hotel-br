@@ -1,6 +1,7 @@
 package dto;
 
 import java.util.Date;
+import java.util.Vector;
 import java.lang.Long;
 
 public class HospedeDTO {
@@ -16,5 +17,19 @@ public class HospedeDTO {
 		this.nacionalidade=nac;
 		this.telefone=telefone;
 		this.reserva=reserva;
+	}
+	
+	// Talvez o mais correto seria enviar os dados num formato Vector<HospedeDTO>
+	// e depois cuidar da conversao diretamente na view
+	public static Vector<Object> convert(HospedeDTO from) {
+		Vector<Object> ret = new Vector<Object>();
+		ret.add(from.id);
+		ret.add(from.nome);
+		ret.add(from.sobrenome);
+		ret.add(from.dataNasc);
+		ret.add(from.nacionalidade);
+		ret.add(from.telefone);
+		ret.add(from.reserva);
+		return ret;
 	}
 }

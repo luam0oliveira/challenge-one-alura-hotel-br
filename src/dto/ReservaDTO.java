@@ -1,6 +1,7 @@
 package dto;
 
 import java.util.Date;
+import java.util.Vector;
 
 public class ReservaDTO {
 	public Date dateIn, dateOut;
@@ -14,5 +15,15 @@ public class ReservaDTO {
 		this.dateOut = out;
 		this.forma = forma;
 		this.valor = valor;		
+	}
+	
+	public static Vector<Object> convert(ReservaDTO from) {
+		Vector<Object> ret = new Vector<Object>();
+		ret.add(from.id);
+		ret.add(from.dateIn);
+		ret.add(from.dateOut);
+		ret.add(from.forma);
+		ret.add(from.valor);
+		return ret;
 	}
 }

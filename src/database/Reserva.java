@@ -19,7 +19,7 @@ public class Reserva {
 	public Vector<ReservaDTO> getReservas() throws Exception {
 		try (Connection con = this.dataBase.getConnection()){
 			Statement stt = con.createStatement();
-			ResultSet result = stt.executeQuery("SELECT * FROM RESERVA;");
+			ResultSet result = stt.executeQuery("SELECT * FROM reserva;");
 			Vector<ReservaDTO> reservas = new Vector<>();
 			
 			while(result.next()) {
@@ -62,6 +62,19 @@ public class Reserva {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return -1L;
+		}
+	}
+	
+	public void delete(Long id) {
+		try (Connection con = this.dataBase.getConnection()){
+			String update = "DELETE FROM reserva WHERE id = ?";
+			PreparedStatement pstt = con.prepareStatement(update);
+			
+			pstt.setLong(1, id);
+
+			pstt.execute();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 }
