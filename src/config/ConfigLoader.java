@@ -9,6 +9,18 @@ public class ConfigLoader {
 	private String databaseUser;
 	private String databaseName;
 	private String databasePassword;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	private String userName;
+
+	public String getUserPass() {
+		return userPass;
+	}
+
+	private String userPass;
 	
 	private static ConfigLoader instance;
 	
@@ -29,6 +41,8 @@ public class ConfigLoader {
 			this.databaseUrl = properties.getProperty("database_url");
 			this.databaseUser = properties.getProperty("database_user");
 			this.databasePassword = properties.getProperty("database_password");
+			this.userName = properties.getProperty("user_name");
+			this.userPass = properties.getProperty("user_pass");
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("Nao foi possivel encontrar as informacoes de configuracao");

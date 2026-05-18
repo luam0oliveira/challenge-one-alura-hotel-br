@@ -53,7 +53,7 @@ public class Sucesso extends JDialog {
 			contentPanel.add(lblNewLabel);
 		}
 		{
-			JLabel lblNewLabel_1 = new JLabel("Registro adicionado com sucesso");
+			JLabel lblNewLabel_1 = new JLabel("Registro efetuado com sucesso");
 			lblNewLabel_1.setForeground(new Color (12, 138, 199));
 			lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 18));
 			lblNewLabel_1.setBounds(27, 122, 322, 21);
@@ -68,8 +68,8 @@ public class Sucesso extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();//serve para fechar a janela atual
-						MenuUsuario usuario = new MenuUsuario(); 
-						usuario.setVisible(true);
+						Buscar buscar = new Buscar();
+						buscar.setVisible(true);
 					}
 				});
 				okButton.setActionCommand("OK");

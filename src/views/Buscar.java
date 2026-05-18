@@ -118,10 +118,7 @@ public class Buscar extends JFrame {
 		scroll_table.setVisible(true);
 		
 		
-		Vector<Vector<Object>> reservasData = buscarController.getAllReservas();
-		for(Vector<Object> vec: reservasData) {
-			modelo.addRow(vec);
-		}		
+		loadAllReservas();
 		
 		tbHospedes = new JTable();
 		tbHospedes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -137,10 +134,8 @@ public class Buscar extends JFrame {
 		JScrollPane scroll_tableHuespedes = new JScrollPane(tbHospedes);
 		panel.addTab("Huéspedes", new ImageIcon(Buscar.class.getResource("/imagenes/pessoas.png")), scroll_tableHuespedes, null);
 		scroll_tableHuespedes.setVisible(true);
-		Vector<Vector<Object>> hospedesData = buscarController.getAllHospedes();
-		for(Vector<Object> vec: hospedesData) {
-			modeloHospedes.addRow(vec);
-		}
+
+		this.loadAllHospedes();
 		
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
@@ -248,6 +243,38 @@ public class Buscar extends JFrame {
 		btnbuscar.setBackground(new Color(12, 138, 199));
 		btnbuscar.setBounds(748, 125, 122, 35);
 		btnbuscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		btnbuscar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable selected = (JTable) ((JScrollPane)panel.getSelectedComponent()).getViewport().getView();
+				String key = txtBuscar.getText();
+				txtBuscar.setText("");
+				if (!key.isEmpty()) {
+					if (selected == tbHospedes) {
+						modeloHospedes.setRowCount(0); // Reset
+						Vector<Vector<Object>> hospedesData = buscarController.findHospedeByTelefone(key);
+						for(Vector<Object> vec: hospedesData) {
+							modeloHospedes.addRow(vec);
+						}
+					} else {
+
+						modelo.setRowCount(0);
+						Long id = Long.parseLong(key);
+						Vector<Vector<Object>> reservasData = buscarController.getReservaByNumeroReserva(id);
+						for(Vector<Object> vec: reservasData) {
+							modelo.addRow(vec);
+						}
+					}
+				} else {
+					// Reseta as duas tabelas
+					if (selected == tbHospedes) {
+						loadAllHospedes();
+					} else {
+						loadAllReservas();
+					}
+				}
+			}
+		});
 		contentPane.add(btnbuscar);
 		
 		JLabel lblBuscar = new JLabel("BUSCAR");
@@ -273,12 +300,25 @@ public class Buscar extends JFrame {
 					Long id = (Long) selected.getValueAt(row, 0);
 					if (selected == tbHospedes) {
 						// TODO: view EditarHospede
+						SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+						Date dataNasc;
+						try {
+							String nome = selected.getValueAt(row, 1).toString();
+							String sobrenome = selected.getValueAt(row, 2).toString();
+							dataNasc = sdt.parse(selected.getValueAt(row,3).toString());
+							String nacio = selected.getValueAt(row, 4).toString();
+							String telefone = selected.getValueAt(row, 5).toString();
+							Long numeroReserva = (Long) selected.getValueAt(row, 6);
+							EditarHospede eh = new EditarHospede(id,nome,sobrenome, dataNasc, nacio, telefone, numeroReserva);
+							eh.setVisible(true);
+							dispose();
+						} catch (Exception e2) {
+							System.out.println(e2.getMessage());
+						}
 					} else {
-//						Date in = new Date("")
 						SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
 						Date in, out;
 						try {
-							System.out.println("KAKKA");
 							in = sdt.parse(selected.getValueAt(row, 1).toString());
 							out = sdt.parse(selected.getValueAt(row, 2).toString());							
 							String forma = (String)selected.getValueAt(row, 4);
@@ -319,6 +359,7 @@ public class Buscar extends JFrame {
 						buscarController.deleteHospede(id);
 					} else {
 						buscarController.deleteReserva(id);
+						loadAllHospedes();
 					}
 					
 					DefaultTableModel model = (DefaultTableModel) selected.getModel();
@@ -335,6 +376,23 @@ public class Buscar extends JFrame {
 		btnDeletar.add(lblExcluir);
 		setResizable(false);
 	}
+
+	private void loadAllHospedes() {
+		this.modeloHospedes.setRowCount(0); // Reset
+		Vector<Vector<Object>> hospedesData = buscarController.getAllHospedes();
+		for(Vector<Object> vec: hospedesData) {
+			this.modeloHospedes.addRow(vec);
+		}
+	}
+
+	private void loadAllReservas() {
+		this.modelo.setRowCount(0);
+		Vector<Vector<Object>> reservasData = buscarController.getAllReservas();
+		for(Vector<Object> vec: reservasData) {
+			modelo.addRow(vec);
+		}
+	}
+
 	
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" e "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {

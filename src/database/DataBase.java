@@ -81,6 +81,7 @@ public class DataBase {
 					+ "FOREIGN KEY (reservaCod) REFERENCES reserva(id) ON DELETE CASCADE\n"
 					+ ");";
 			stt.addBatch(query);
+
 			stt.executeBatch();
 		} catch(Exception ex) {
 			System.out.println(ex.getMessage());

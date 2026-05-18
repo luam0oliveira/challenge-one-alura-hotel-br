@@ -36,7 +36,30 @@ public class Reserva {
 		} catch(Exception ex) {
 			throw new Exception("Problema");
 		}
-		
+	}
+
+	public Vector<ReservaDTO> getReservasById(Long reservaId) throws Exception {
+		try (Connection con = this.dataBase.getConnection()){
+			PreparedStatement stt = con.prepareStatement("SELECT * FROM reserva WHERE id = ?");
+			stt.setLong(1, reservaId);
+			ResultSet result = stt.executeQuery();
+			Vector<ReservaDTO> reservas = new Vector<>();
+
+			while(result.next()) {
+				Long id = result.getLong("id");
+				Date in = result.getDate("dataIn");
+				Date out = result.getDate("dataOut");
+				Double valor = result.getDouble("valor");
+				String forma = result.getString("forma");
+
+				reservas.add(new ReservaDTO(id, in, out, valor, forma));
+			}
+
+			return reservas;
+		} catch(Exception ex) {
+			throw new Exception("Problema");
+		}
+
 	}
 	
 	// funfact: no linux(por padrao) o nome das tabelas eh case-sensitive
